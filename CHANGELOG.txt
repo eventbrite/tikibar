@@ -1,0 +1,3 @@
+0.0.17 (2017-11-28)
+-------------------
+Correctly scale the flame graph so it shows all the samples.
