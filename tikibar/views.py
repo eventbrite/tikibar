@@ -91,14 +91,18 @@ def tikibar(request):
 
         # Massage data
         def expand_durations(obj):
-            if isinstance(obj, dict) and obj.keys()[0] == 'd':
-                return duration(obj)
-            elif isinstance(obj, dict):
-                return dict([(key, expand_durations(value)) for key, value in obj.items()])
-            elif isinstance(obj, list) or isinstance(obj, tuple):
-                return [expand_durations(item) for item in obj]
-            else:
-                return obj
+            try:
+                if isinstance(obj, dict) and obj.keys() > 0 and obj.keys()[0] == 'd':
+                    return duration(obj)
+                elif isinstance(obj, dict):
+                    return dict([(key, expand_durations(value)) for key, value in obj.items()])
+                elif isinstance(obj, list) or isinstance(obj, tuple):
+                    return [expand_durations(item) for item in obj]
+                else:
+                    return obj
+            except IndexError:
+                pass
+
         data = expand_durations(data)
 
         total_time = data['total_time']['duration']
