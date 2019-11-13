@@ -83,6 +83,7 @@ def tikibar(request):
         data['request_history'] = request_history
         data['release_hash'] = data['release'].split('-')[-1]
         data['bars'] = []
+        data['queries'] = data.get('queries', []) or []
 
         now = time.time()
         for row in data['request_history']:
@@ -108,7 +109,7 @@ def tikibar(request):
         total_time = data['total_time']['duration']
 
         queries, total_query_time = format_queries(
-            data.get('queries', {}),
+            data['queries'],
             total_time,
             data['bars']
         )
