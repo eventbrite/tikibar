@@ -38,8 +38,10 @@ def clear_current_request():
 
     __current_instances.request = None
 
+
 class SetCorrelationIDMiddleware(object):
-    def process_request(self, request):
+    @staticmethod
+    def process_request(request):
         # Add a correlation id to the request (needed later)
         request.correlation_id = uuid.uuid1(
             node=uuid.getnode(),
@@ -50,7 +52,8 @@ class SetCorrelationIDMiddleware(object):
 
 class TikibarMiddleware(object):
 
-    def process_request(self, request):
+    @staticmethod
+    def process_request(request):
         from .toolbar_metrics import get_toolbar
         # set the request on tikibar's context
         set_current_request(request)
@@ -72,7 +75,8 @@ class TikibarMiddleware(object):
                     request.maxrss_start = rusage.ru_maxrss
         return None
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    @staticmethod
+    def process_view(request, view_func, view_args, view_kwargs):
         from .toolbar_metrics import get_toolbar
         if not tikibar_feature_flag_enabled(request):
             return None
@@ -83,7 +87,8 @@ class TikibarMiddleware(object):
 
         return None
 
-    def process_response(self, request, response):
+    @staticmethod
+    def process_response(request, response):
         from .toolbar_metrics import get_toolbar
         if not tikibar_feature_flag_enabled(request):
             return response

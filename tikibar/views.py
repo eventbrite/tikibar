@@ -21,17 +21,19 @@ TIKI_ANGER_THRESHOLD = 500 # 500ms
 
 TIKI_BAR_COLORS = ['#8adb1e', '#1c4dcb', '#b21ccb', '#f53522', '#f5aa22', '#e7f021']
 
+
 def tiki_response(response):
     response['x-suppress-tikibar'] = '1'
     setattr(response, 'xframe_option', 'EXEMPT')
     return response
 
+
 @ssl_required
 def tikibar_settings(request):
     if not tikibar_feature_flag_enabled(request):
-        raise Http404, 'Tikibar is turned off'
+        raise Http404('Tikibar is turned off')
     if not request.user or not request.user.is_staff:
-        raise Http404, 'Staff required'
+        raise Http404('Staff required')
     is_active = bool(get_tiki_token_or_false(request))
     t = template.loader.get_template('tikibar/tikibar_settings.html')
     return HttpResponse(t.render(template.RequestContext(request, {
@@ -234,10 +236,11 @@ def tikibar_on(request):
         t = template.loader.get_template('tikibar/tikibar_on.html')
         return HttpResponse(t.render(template.RequestContext(request, {})))
 
+
 @ssl_required
 def tikibar_off(request):
     if not tikibar_feature_flag_enabled(request):
-        raise Http404, 'Tikibar is turned off'
+        raise Http404('Tikibar is turned off')
     if request.method == 'POST':
         response = HttpResponse("""
             Tikibar is now off <a href="/">Go home</a><script>window.parent.postMessage(JSON.stringify({'tiki_msg_type': 'hide'}), '*');</script>
@@ -248,6 +251,7 @@ def tikibar_off(request):
     else:
         t = template.loader.get_template('tikibar/tikibar_off.html')
         return tiki_response(HttpResponse(t.render(template.RequestContext(request, {}))))
+
 
 def duration(obj):
     return {
@@ -283,9 +287,9 @@ def set_token_cross_domain(request):
 @ssl_required
 def tikibar_set_for_api_domain(request):
     if not settings.TIKIBAR_SETTINGS.get('api_domain'):
-        raise Http404, 'No API domain defined'
+        raise Http404('No API domain defined')
     if not tikibar_feature_flag_enabled(request):
-        raise Http404, 'Tikibar is turned off'
+        raise Http404('Tikibar is turned off')
     if not request.user or not request.user.is_staff:
         return HttpResponse('You must be signed in as staff')
     nonce = os.urandom(16).encode('hex')

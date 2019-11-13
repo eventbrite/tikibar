@@ -1,7 +1,6 @@
 from collections import defaultdict
 import importlib
 import inspect
-import logging
 import re
 
 from django.core.cache import cache

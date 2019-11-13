@@ -5,7 +5,7 @@ import logging
 from functools import wraps
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponsePermanentRedirect, Http404
+from django.http import HttpResponsePermanentRedirect
 
 TIKIBAR_DATA_STORAGE_TIMEOUT = 3000 # time to store cache data
 TIKI_COOKIE = 'tikibar_active'
