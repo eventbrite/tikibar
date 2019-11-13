@@ -26,6 +26,8 @@ TIKI_ANGER_THRESHOLD = 500  # 500ms
 
 TIKI_BAR_COLORS = ['#8adb1e', '#1c4dcb', '#b21ccb', '#f53522', '#f5aa22', '#e7f021']
 
+FIELD_DURATION = 'd'
+
 
 def tiki_response(response):
     response['x-suppress-tikibar'] = '1'
@@ -40,10 +42,8 @@ def tikibar_settings(request):
     if not request.user or not request.user.is_staff:
         raise Http404('Staff required')
     is_active = bool(get_tiki_token_or_false(request))
-    t = template.loader.get_template('tikibar/tikibar_settings.html')
-    return HttpResponse(t.render(template.RequestContext(request, {
-        'is_active': is_active,
-    })))
+    settings_template = template.loader.get_template('tikibar/tikibar_settings.html')
+    return HttpResponse(settings_template.render(template.RequestContext(request, {'is_active': is_active})))
 
 
 @ssl_required
@@ -95,12 +95,12 @@ def tikibar(request):
         now = time.time()
         for row in data['request_history']:
             row['ago'] = now - row['t']
-            row['ms'] = row['d'] * 1000
+            row['ms'] = row[FIELD_DURATION] * 1000
 
         # Massage data
         def expand_durations(obj):
             try:
-                if isinstance(obj, dict) and obj.keys() > 0 and obj.keys()[0] == 'd':
+                if isinstance(obj, dict) and obj.keys() > 0 and obj.keys()[0] == FIELD_DURATION:
                     return duration(obj)
                 elif isinstance(obj, dict):
                     return dict([(key, expand_durations(value)) for key, value in obj.items()])
@@ -229,7 +229,6 @@ def add_bars_to_items(items, unique_keyname):
 
 @ssl_required
 def tikibar_on(request):
-
     if not request.user or not request.user.is_staff:
         return HttpResponse('You must be signed in as staff')
 
@@ -246,6 +245,7 @@ def tikibar_on(request):
 def tikibar_off(request):
     if not tikibar_feature_flag_enabled(request):
         raise Http404('Tikibar is turned off')
+
     if request.method == 'POST':
         go_home_link = '<a href="/">Go home</a>'
         hide_tikibar_script = '<script>window.parent.postMessage(JSON.stringify({"tiki_msg_type": "hide"}), "*");</script>'  # noqa
@@ -260,9 +260,9 @@ def tikibar_off(request):
 
 def duration(obj):
     return {
-        'start': obj['d'][0],
-        'end': obj['d'][1],
-        'duration': (obj['d'][1] - obj['d'][0]) * 1000
+        'start': obj[FIELD_DURATION][0],
+        'end': obj[FIELD_DURATION][1],
+        'duration': (obj[FIELD_DURATION][1] - obj[FIELD_DURATION][0]) * 1000
     }
 
 
