@@ -804,7 +804,7 @@ html {
             </thead>
             <tbody>
                 {% for query in tiki.queries %}
-                <tr style="cursor:pointer" onclick="$(this).next().toggle()">
+                <tr style="cursor:pointer" onclick="$(this).next().toggle(); transmitSize();">
                     <td>{{ query.timing.duration|floatformat:2 }}<span class="tiki-qualifier">ms</span></td>
                     <td class="tiki-sql" style="border-color: #{{ query.color }};">{{ query.sql|safe }}</td>
                     <td class="tiki-timing-graph">
