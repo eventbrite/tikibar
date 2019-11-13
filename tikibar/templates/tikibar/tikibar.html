@@ -813,9 +813,39 @@ html {
                     </td>
                     <td class="tiki-type">{{ query.type }}</td>
                 </tr>
-                <tr style="background-color:#b25f1c; display:none" onclick="toggle">
+                <tr style="background-color:#b25f1c; display:none">
                     <td>EXPLAIN</td>
-                    <td class="tiki-sql" style="border-color: #{{ query.color }};">{{ query.explain_data|safe }}</td>
+                    <td class="tiki-sql" style="border-color: #{{ query.color }};">
+                        {% if query.explain_data %}
+                        <table>
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Select Type</th>
+                                <th>Table</th>
+                                <th>Partition</th>
+                                <th>Type</th>
+                                <th>Possible Keys</th>
+                                <th>Key</th>
+                                <th>Key Len</th>
+                                <th>Ref</th>
+                                <th>Rows</th>
+                                <th>Filtered</th>
+                                <th>Extra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for step in query.explain_data %}
+                            <tr>
+                            {% for col in step %}
+                                <td>{{ col }}</td>
+                            {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+                    </td>
                     <td></td>
                     <td class="tiki-type" style="background-color: #d36e1d">EXPLAIN</td>
                 </tr>
