@@ -78,7 +78,7 @@ class ToolbarMetricsContainer(object):
 
     def add_query_metric(self, metric_type, query_type, val, start, stop, needs_format=False, explain_data=None):
         self.metrics['queries'][metric_type].append(
-            (query_type, val, needs_format, {'d': (start, stop)})
+            (query_type, val, needs_format, {'d': (start, stop)}, explain_data)
         )
 
     def add_sql_query_metric(self, query_type, val, start, stop, args):
@@ -148,12 +148,13 @@ class ToolbarMetricsContainer(object):
                     re.sub(r"/\*.+\*/", "", val)[:50] + "...",
                     needs_format,
                     timing,
+                    "",
                 )
-                for query_type, val, needs_format, timing in self.metrics["queries"]["SQL"]
+                for query_type, val, needs_format, timing, explain_data in self.metrics["queries"]["SQL"]
             ]
         if len(repr(self.metrics)) > self.max_size:
             self.metrics["queries"]["SQL"] = [
-                (query_type, "", needs_format, timing)
-                for query_type, val, needs_format, timing in self.metrics["queries"]["SQL"]
+                (query_type, "", needs_format, timing, "")
+                for query_type, val, needs_format, timing, explain_data in self.metrics["queries"]["SQL"]
             ]
         publish_toolbar_metrics(self.correlation_id, self.metrics)

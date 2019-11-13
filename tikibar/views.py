@@ -188,13 +188,14 @@ def format_queries(input_queries, total_time, bars):
     total_query_time = 0.0
     for metric_type in input_queries:
         metric_timing = 0.0
-        for query_type, val, needs_format, timing in input_queries.get(metric_type, []):
+        for query_type, val, needs_format, timing, explain_data in input_queries.get(metric_type, []):
             if needs_format:
                 val = reformat_sql(val)
             queries.append({
                 'sql': val,
                 'type': query_type,
                 'timing': timing,
+                'explain_data': explain_data,
             })
             metric_timing += timing['duration']
         bars.append({
