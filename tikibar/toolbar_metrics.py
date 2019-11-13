@@ -81,9 +81,15 @@ class ToolbarMetricsContainer(object):
             (query_type, val, needs_format, {'d': (start, stop)}, explain_data)
         )
 
-    def add_sql_query_metric(self, query_type, val, start, stop, args):
+    def add_sql_query_metric(self, query_type, val, start, stop, db_alias=None, args=None):
 
-        with connections['default'].cursor() as cursor:
+        if db_alias is None:
+            db_alias = 'default'
+
+        if args is None:
+            args = tuple()
+
+        with connections[db_alias].cursor() as cursor:
             try:
                 cursor.execute("EXPLAIN {}".format(val), args)
                 explain_data = cursor.fetchall()
