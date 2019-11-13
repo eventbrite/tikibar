@@ -14,6 +14,8 @@ from .utils import (
     ssl_required,
 )
 
+from constants import FIELD_DURATION
+
 import hashlib
 import itertools
 import json
@@ -25,8 +27,6 @@ from .sql_utils import reformat_sql
 TIKI_ANGER_THRESHOLD = 500  # 500ms
 
 TIKI_BAR_COLORS = ['#8adb1e', '#1c4dcb', '#b21ccb', '#f53522', '#f5aa22', '#e7f021']
-
-FIELD_DURATION = 'd'
 
 
 def tiki_response(response):

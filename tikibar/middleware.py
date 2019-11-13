@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.cache import cache
 from sampler import Sampler
 
+
+from constants import FIELD_DURATION
 from .utils import (
     _should_show_tikibar_for_request,
     get_tiki_token_or_false,
@@ -55,29 +57,35 @@ class TikibarMiddleware(object):
     @staticmethod
     def process_request(request):
         from .toolbar_metrics import get_toolbar
+
         # set the request on tikibar's context
         set_current_request(request)
-        if tikibar_feature_flag_enabled(request):
-            toolbar = get_toolbar()
-            if toolbar.is_active():
-                if settings.TIKIBAR_SETTINGS.get('enable_profiler'):
-                    profile_interval = settings.TIKIBAR_SETTINGS.get('profile_interval', 0.01)
-                    request.sampler = Sampler(interval=profile_interval)
-                    request.sampler.start()
-                rusage = resource.getrusage(resource.RUSAGE_SELF)
-                if not hasattr(request, 'req_start_time'):
-                    request.req_start_time = time.time()
-                if not hasattr(request, 'utime_start'):
-                    request.utime_start = rusage.ru_utime
-                if not hasattr(request, 'stime_start'):
-                    request.stime_start = rusage.ru_stime
-                if not hasattr(request, 'maxrss_start'):
-                    request.maxrss_start = rusage.ru_maxrss
+
+        if not tikibar_feature_flag_enabled(request):
+            return None
+
+        toolbar = get_toolbar()
+        if toolbar.is_active():
+            if settings.TIKIBAR_SETTINGS.get('enable_profiler'):
+                profile_interval = settings.TIKIBAR_SETTINGS.get('profile_interval', 0.01)
+                request.sampler = Sampler(interval=profile_interval)
+                request.sampler.start()
+            rusage = resource.getrusage(resource.RUSAGE_SELF)
+            if not hasattr(request, 'req_start_time'):
+                request.req_start_time = time.time()
+            if not hasattr(request, 'utime_start'):
+                request.utime_start = rusage.ru_utime
+            if not hasattr(request, 'stime_start'):
+                request.stime_start = rusage.ru_stime
+            if not hasattr(request, 'maxrss_start'):
+                request.maxrss_start = rusage.ru_maxrss
+
         return None
 
     @staticmethod
     def process_view(request, view_func, view_args, view_kwargs):
         from .toolbar_metrics import get_toolbar
+
         if not tikibar_feature_flag_enabled(request):
             return None
 
@@ -90,6 +98,7 @@ class TikibarMiddleware(object):
     @staticmethod
     def process_response(request, response):
         from .toolbar_metrics import get_toolbar
+
         if not tikibar_feature_flag_enabled(request):
             return response
 
@@ -100,17 +109,20 @@ class TikibarMiddleware(object):
             rusage = resource.getrusage(resource.RUSAGE_SELF)
             # convert kB to MB
             rss_growth = (rusage.ru_maxrss - request.maxrss_start) / 1000
-            toolbar.add_singular_metric('total_time', {'d': [request.req_start_time, request.req_stop_time]})
-            toolbar.add_singular_metric('user_cpu', {'d': [request.utime_start, rusage.ru_utime]})
-            toolbar.add_singular_metric('system_cpu', {'d': [request.stime_start, rusage.ru_stime]})
+            toolbar.add_singular_metric('total_time', {FIELD_DURATION: [request.req_start_time, request.req_stop_time]})
+            toolbar.add_singular_metric('user_cpu', {FIELD_DURATION: [request.utime_start, rusage.ru_utime]})
+            toolbar.add_singular_metric('system_cpu', {FIELD_DURATION: [request.stime_start, rusage.ru_stime]})
             toolbar.add_singular_metric('rss_growth', rss_growth)
             toolbar.add_singular_metric('release', getattr(settings, 'RELEASE', 'master'))
             toolbar.add_singular_metric('request_path', request.get_full_path())
+
             if settings.TIKIBAR_SETTINGS.get('enable_profiler'):
                 toolbar.add_stack_samples(request.sampler.output_stats())
                 toolbar.add_singular_metric('stack_sample_count', request.sampler.sample_count())
                 request.sampler.stop()
+
             toolbar.write_metrics()
+
             if response.get('content-type', '').startswith('text/html')\
                     and response.content \
                     and not response.get('x-suppress-tikibar')\
@@ -119,15 +131,14 @@ class TikibarMiddleware(object):
                 content = content.replace(
                     '</head>', '<meta name="correlation_id" value="%s"></head>' % request.correlation_id
                 )
-                # TODO: Figure out a staticfiles implementation that
-                # works for this.
+                # TODO: Figure out a staticfiles implementation that works for this.
                 script_str = '<script>window.TIKI_PROTOCOL = "{protocol}";</script>\n'.format(
                     protocol='http' if (settings.DEBUG and not request.is_secure()) else 'https'
                 )
                 with open(os.path.join(os.path.dirname(__file__), 'static/js/tikibar.js'), 'r') as js:
                     script_str += '<script type="text/javascript" charset="utf-8">{}</script>'.format(
-                            js.read().encode('utf-8')
-                        )
+                        js.read().encode('utf-8')
+                    )
                     content = content.replace(
                         '</body>', '%s%s' % (script_str, '</body>')
                     )
@@ -146,14 +157,11 @@ class TikibarMiddleware(object):
             if tiki_token and not response.get('x-suppress-tikibar'):
                 cache_key = 'tikibar:history:%s' % tiki_token
                 current = cache.get(cache_key) or ''
-                if current:
-                    current_list = json.loads(current)
-                else:
-                    current_list = []
+                current_list = json.loads(current) if current else []
 
                 # JSON blob with metadata about request
                 current_list.append({
-                    'd': request_duration,
+                    FIELD_DURATION: request_duration,
                     't': request.req_start_time,
                     'u': request.get_full_path(),
                     'c': request.correlation_id,
