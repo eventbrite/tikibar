@@ -13,11 +13,16 @@ from .utils import (
     get_tiki_token_or_false_for_tikibar_view,
     ssl_required,
 )
-import json, hashlib, itertools, time, os
+
+import hashlib
+import itertools
+import json
+import os
+import time
 
 from .sql_utils import reformat_sql
 
-TIKI_ANGER_THRESHOLD = 500 # 500ms
+TIKI_ANGER_THRESHOLD = 500  # 500ms
 
 TIKI_BAR_COLORS = ['#8adb1e', '#1c4dcb', '#b21ccb', '#f53522', '#f5aa22', '#e7f021']
 
@@ -242,9 +247,9 @@ def tikibar_off(request):
     if not tikibar_feature_flag_enabled(request):
         raise Http404('Tikibar is turned off')
     if request.method == 'POST':
-        response = HttpResponse("""
-            Tikibar is now off <a href="/">Go home</a><script>window.parent.postMessage(JSON.stringify({'tiki_msg_type': 'hide'}), '*');</script>
-        """)
+        go_home_link = '<a href="/">Go home</a>'
+        hide_tikibar_script = '<script>window.parent.postMessage(JSON.stringify({"tiki_msg_type": "hide"}), "*");</script>'  # noqa
+        response = HttpResponse('Tikibar is now off {}{}'.format(go_home_link, hide_tikibar_script))
         # response.delete_cookie('tikibar_active')
         set_tikibar_disabled_by_user(response)
         return tiki_response(response)
@@ -273,14 +278,12 @@ def set_token_cross_domain(request):
     if not nonce:
         return HttpResponse('Could not set, no nonce')
     try:
-        signer = signing.TimestampSigner()
-        key = signer.unsign(nonce, max_age=10).split(r'tikibar-nonce:')[1]
         # We return a 1x1 transparent gif, since we're triggered by an <img src="">
         gif = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".decode('base64')
-        response = HttpResponse(gif, content_type = 'image/gif')
+        response = HttpResponse(gif, content_type='image/gif')
         set_tikibar_active_on_response(response, request)
         return response
-    except:
+    except Exception:
         return HttpResponse('Could not set, invalid nonce')
 
 
