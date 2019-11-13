@@ -1,13 +1,17 @@
 import os
 import uuid
-import urlparse
+
+try:
+    import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 import logging
 from functools import wraps
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
 
-TIKIBAR_DATA_STORAGE_TIMEOUT = 3000 # time to store cache data
+TIKIBAR_DATA_STORAGE_TIMEOUT = 3000  # time to store cache data
 TIKI_COOKIE = 'tikibar_active'
 TIKIBAR_VIEW_COOKIE_NAME = 'tikiok'
 TIKI_SALT_HTTPS = 'tiki-salt-extra-https'
