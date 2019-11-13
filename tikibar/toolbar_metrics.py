@@ -4,6 +4,7 @@ import inspect
 import re
 
 from django.core.cache import cache
+from django.db import connections
 
 from .middleware import get_current_request
 from .utils import (
@@ -75,12 +76,20 @@ class ToolbarMetricsContainer(object):
     def add_timed_metric(self, metric_type, val, start, stop):
         self.metrics[metric_type].append((val, {'d': (start, stop)}))
 
-    def add_query_metric(self, metric_type, query_type, val, start, stop, needs_format=False):
+    def add_query_metric(self, metric_type, query_type, val, start, stop, needs_format=False, explain_data=None):
         self.metrics['queries'][metric_type].append(
             (query_type, val, needs_format, {'d': (start, stop)})
         )
 
-    def add_sql_query_metric(self, query_type, val, start, stop):
+    def add_sql_query_metric(self, query_type, val, start, stop, args):
+
+        with connections['default'].cursor() as cursor:
+            try:
+                cursor.execute("EXPLAIN {}".format(val), args)
+                explain_data = cursor.fetchall()
+            except Exception:
+                explain_data = None
+
         self.add_query_metric(
             metric_type='SQL',
             query_type=query_type,
@@ -88,6 +97,7 @@ class ToolbarMetricsContainer(object):
             start=start,
             stop=stop,
             needs_format=True,
+            explain_data=explain_data
         )
 
     def add_freeform_metric(self, metric_type, data):
