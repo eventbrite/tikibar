@@ -6,6 +6,10 @@ import re
 from django.core.cache import cache
 from django.db import connections
 
+from .constants import (
+    DONT_MEASURE_QUERY_SQL_SUFFIX,
+    DONT_MEASURE_QUERY_SUFFIXES
+)
 from .middleware import get_current_request
 from .utils import (
     get_tiki_token_or_false,
@@ -82,22 +86,26 @@ class ToolbarMetricsContainer(object):
         )
 
     def add_sql_query_metric(self, query_type, val, start, stop, db_alias='default', args=tuple()):
+        def _query_should_be_measured(query, query_type='SQL'):
+            return not query.endswith(DONT_MEASURE_QUERY_SUFFIXES[query_type])
+
         with connections[db_alias].cursor() as cursor:
             try:
-                cursor.execute("EXPLAIN {}".format(val), args)
+                cursor.execute("EXPLAIN {}{}".format(val, DONT_MEASURE_QUERY_SQL_SUFFIX), args)
                 explain_data = cursor.fetchall()
             except Exception:
                 explain_data = None
 
-        self.add_query_metric(
-            metric_type='SQL',
-            query_type=query_type,
-            val=val,
-            start=start,
-            stop=stop,
-            needs_format=True,
-            explain_data=explain_data
-        )
+        if _query_should_be_measured(val, 'SQL'):
+            self.add_query_metric(
+                metric_type='SQL',
+                query_type=query_type,
+                val=val,
+                start=start,
+                stop=stop,
+                needs_format=True,
+                explain_data=explain_data
+            )
 
     def add_freeform_metric(self, metric_type, data):
         self.metrics[metric_type].append(data)
