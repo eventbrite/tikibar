@@ -565,6 +565,9 @@ html {
     position: absolute;
     bottom: 10px;
     right: 10px;
+{% if tiki.explain_enabled %}
+    transform: scaleX(-1);
+{% endif %}
 }
 
 #tikibar .tikibasement h2 {
