@@ -12,6 +12,8 @@ from .utils import (
     tikibar_feature_flag_enabled,
     get_tiki_token_or_false_for_tikibar_view,
     ssl_required,
+    get_tiki_explain,
+    set_tiki_explain,
 )
 
 from constants import FIELD_DURATION
@@ -257,6 +259,15 @@ def tikibar_off(request):
     else:
         t = template.loader.get_template('tikibar/tikibar_off.html')
         return tiki_response(HttpResponse(t.render(template.RequestContext(request, {}))))
+
+
+@ssl_required
+def toggle_explain_queries(request):
+    tiki_explain_enabled = get_tiki_explain(request)
+
+    response = HttpResponse()
+    set_tiki_explain(response, not tiki_explain_enabled)
+    return tiki_response(response)
 
 
 def duration(obj):
