@@ -401,6 +401,17 @@ html {
     top: 0;
     left: 0;
 }
+#tikibar .tiki-glasses {
+    z-index: 99999999;
+    top: 4px;
+    height: 42px;
+    width: 30px;
+    margin: -1px 0 0 -37px;
+    position: relative;
+    background-repeat: no-repeat;
+    float: left;
+    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABHNCSVQICAgIfAhkiAAABLRJREFUSIntlEts1FUYxc99/N/zHubR0tJQihrkqTwXYogGIoKJIS7csjOuDCtX7o0QXbnQjVswBhNNVAJYEwOVWFpLW16ltJ2Zdphpmff8X/deF9SmC6Jrk/5W3+ac+325JwfYYIMN/u+QtYEQ0zacF3pSfXst3d5rG3YPIZSGIvDabututVm5sdKo/CWkWH6eEaUskYqmd2fiuf227uzWuGZJpaTrdypu4I4vrhTHWt3GtFKqAwB8VWfu237406Hs9uOZSGaIEsKg1Lr1iKp1asvVVmX06vhP5/zQu7P+Uc607W/sO3k+F8sfTJixrFKKKCkBQkAIAQhRlXZ19nFl9vrI1PA5BVVnjPHU0d1vfn1o8PBZmxqbKGVUUAIXAh4ECGNghBKDcDtlJ7cNZAdPLbeqbT/0u4zyTCqaOXH60Htf9cV6jxhUiyjOiAcJFwKKEjDGQIQkNjOSm5P9ryTi6QMLldmrPJfs3f9i744TwvdBGENHBeA5YN+pbeioJhqjEnN/lpAy4xCui7ST7t+z9eCFlUb1MQDEY+m+lJmIQylA11GnNex6Zwhsk4Sscox9fx8JLQHieVAiRF+s93AmlnuVp2PZ47ZmxUPpQTCK1B4HZz56CzHbAfwuiscKuPZjAYVvGkjoNhCGJKI7ERXBTgAwDRsUgNI4aqSGs1+cQTaXBg8kGmIZ2q4aRs4/Qob0Q7guLM1yUk76XRoxY8ehAMoY6u06Xnv/AKKRCHggsFC4gmJxGNEjHfjRBkIlAQAG1yGVgoKCzjQoKRFIgZdPDCKb3wQTFiqVUczd/xZB/wr0HU0EUqxlIuGkjlIQQlcDBDdwYeQJXNnB/dYtlBvjKMxdhgpXoKUDhKtinWsIVYhQCliaCQAQSsLIUnRFG0XvIebrf2B+4TK89jysTIgg9KGwFlhK/5mUlLB0C3cmJjHr38W8P42yOwYStaA6dbhFDWo16SY3kEvmkUvlYXHjmROhmLtXwHzwADP+FJbcCXiOBHHraM0KcK5BSrl2Ncsm829vSW8ZEmFAdMPE4+lFRAYMkBxFl3cRdHQ8uBiFUe4BlwBVSi7WShPDd375+GFp6lLSTvRHzGieUkYrD1sgeYFIj4W6UQfhOgq/GnBv9YP6FBphIICarT4aYwY3cwOZwWMclEshoFwNxdtPUL63gupdH0tXouCFARBfwSAMy83q3NXJnz9caS9/1/W7E6WnxcmexObXI7qT5pqO8l91FMbLqM50sPQ7h3d7CzTfgiYAzhi80AsmFsY+Y22vVbJMZygfz79EAaggBAt00CcOsJCA0U0i7LiIchNSyXB4+ton5frSJeDZh/mhv1Dr1JpD2aGTHISpANAaDjAfhVHLQnUldAkYmg4AGJsbvXi3NPU5k1LUF1cKNywzcihuJXI60xhRCioIQIQElRK2ZqDtteo3Z258+WDp3gUA/vrmarqNqZbXoploZqej2bYMAkBIkFDAZBo0riEIXH+6NDkyMnPzg1CGJbJOb9qGc3Rzsu8YAYFUUmic637gdxtuc77afPKDUqr8vJ5e163JdDR9Om7Ftxqa4YRCBJRQrpSUhaeF6x2v/RsA9989Nthggw3+g78B+kA4AwndZrgAAAAASUVORK5CYII=')
+}
 #tikibar h1 .eyes {
     position: absolute;
     top: 12px;
@@ -749,6 +760,9 @@ html {
     </div>
 
     <div class="tikifacade">
+        {% if tiki.explain_enabled %}
+        <span class="tiki-glasses"></span>
+        {% endif %}
         <h1{% if tiki.angry %} class="tiki-angry"{% endif %}><span class="eyes eye-left"></span><span class="eyes eye-right"></span><em>Tikibar</em></h1>
 
         <a href="#tiki-server-time" class="tiki-set tiki-js-toggle">
