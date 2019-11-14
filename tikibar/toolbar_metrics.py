@@ -13,6 +13,7 @@ from .constants import (
 from .middleware import get_current_request
 from .utils import (
     get_tiki_token_or_false,
+    is_tiki_explain_enabled,
     TIKIBAR_DATA_STORAGE_TIMEOUT,
     find_view_subpath,
     format_dict_as_lines,
@@ -89,12 +90,14 @@ class ToolbarMetricsContainer(object):
         def _query_should_be_measured(query, query_type='SQL'):
             return not query.endswith(DONT_MEASURE_QUERY_SUFFIXES[query_type])
 
-        with connections[db_alias].cursor() as cursor:
-            try:
-                cursor.execute("EXPLAIN {}{}".format(val, DONT_MEASURE_QUERY_SQL_SUFFIX), args)
-                explain_data = cursor.fetchall()
-            except Exception:
-                explain_data = None
+        explain_data = None
+        if is_tiki_explain_enabled(get_current_request()):
+            with connections[db_alias].cursor() as cursor:
+                try:
+                    cursor.execute("EXPLAIN {}{}".format(val, DONT_MEASURE_QUERY_SQL_SUFFIX), args)
+                    explain_data = cursor.fetchall()
+                except Exception:
+                    pass
 
         if _query_should_be_measured(val, 'SQL'):
             self.add_query_metric(

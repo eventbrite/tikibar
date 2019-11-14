@@ -304,6 +304,14 @@ jQuery(function($) {
         window.parent.postMessage(JSON.stringify({'tiki_msg_type': 'hide'}), '*');
         return false;
     });
+    $('#js-tiki-toggle-explains').click(function(ev) {
+        $.ajax({
+            url: '/tikibar/toggle-explain-queries/',
+            success: function() {
+                window.parent.location.reload();
+            }
+        });
+    });
 });
 </script>
 <style>
@@ -702,6 +710,14 @@ html {
     margin: 0;
 }
 
+#tikibar .tiki-query-clickable {
+    cursor: pointer;
+}
+
+#tikibar .tiki-query-clickable:hover {
+    background-color: #e2761f;
+}
+
 #tikibar .tiki-explain-table {
     background-color:#9c3f5d;
 }
@@ -819,7 +835,12 @@ html {
             </thead>
             <tbody>
                 {% for query in tiki.queries %}
-                <tr style="cursor:pointer" onclick="$(this).next().toggle(); transmitSize();">
+                <tr
+                    {% if query.explain_data %}
+                    class="tiki-query-clickable"
+                    onclick="$(this).next().toggle(); transmitSize();"
+                    {% endif %}
+                >
                     <td>{{ query.timing.duration|floatformat:2 }}<span class="tiki-qualifier">ms</span></td>
                     <td class="tiki-sql" style="border-color: #{{ query.color }};">{{ query.sql|safe }}</td>
                     <td class="tiki-timing-graph">
@@ -828,10 +849,10 @@ html {
                     </td>
                     <td class="tiki-type">{{ query.type }}</td>
                 </tr>
+                {% if query.explain_data %}
                 <tr style="background-color:#b25f1c; display:none">
                     <td style="background-color: #d36e1d">EXPLAIN</td>
                     <td class="tiki-sql" style="border-color: #{{ query.color }};">
-                        {% if query.explain_data %}
                         <table class="tiki-explain-table">
                         <thead>
                             <tr>
@@ -859,11 +880,11 @@ html {
                         {% endfor %}
                         </tbody>
                         </table>
-                        {% endif %}
                     </td>
                     <td style="background-color: #d36e1d"></td>
                     <td class="tiki-type" style="background-color: #d36e1d"></td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
          </table>
@@ -1089,7 +1110,13 @@ html {
         </form>
         <form id="js-tiki-toggle-explains">
             <p>
-                <input class="tiki-submit" type="button" value="Toggle query explains">
+                <input class="tiki-submit" type="button"
+                    {% if tiki.explain_enabled %}
+                        value="Turn off query explains"
+                    {% else %}
+                        value="Turn on query explains"
+                    {% endif %}
+                >
             </p>
         </form>
 

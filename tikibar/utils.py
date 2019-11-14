@@ -145,18 +145,23 @@ def set_tikibar_disabled_by_user(response):
     )
 
 
-def get_tiki_explain(request):
-    return request.get_signed_cookie(
-        TIKI_EXPLAIN,
-        default=False,
-        max_age=TIKI_EXPLAIN_EXPIRATION
-    )
+def is_tiki_explain_enabled(request):
+    try:
+        tiki_explain_cookie = request.get_signed_cookie(
+            TIKI_EXPLAIN,
+            max_age=TIKI_EXPLAIN_EXPIRATION
+        )
+    except KeyError:
+        tiki_explain_cookie = '0'
+
+    return tiki_explain_cookie == '1'
 
 
 def set_tiki_explain(response, value):
+    # Value should be an integer or a boolean
     response.set_signed_cookie(
         TIKI_EXPLAIN,
-        value,
+        int(value),
         domain=settings.TIKIBAR_SETTINGS.get('domain'),
     )
 

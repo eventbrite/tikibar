@@ -12,7 +12,7 @@ from .utils import (
     tikibar_feature_flag_enabled,
     get_tiki_token_or_false_for_tikibar_view,
     ssl_required,
-    get_tiki_explain,
+    is_tiki_explain_enabled,
     set_tiki_explain,
 )
 
@@ -153,6 +153,8 @@ def tikibar(request):
         if total_time > TIKI_ANGER_THRESHOLD:
             data['angry'] = True
 
+    data['explain_enabled'] = is_tiki_explain_enabled(request)
+
     if request.GET.get('render'):
         template_name = 'tikibar.html'
         if request.GET.get('template') == 'minibar':
@@ -263,10 +265,10 @@ def tikibar_off(request):
 
 @ssl_required
 def toggle_explain_queries(request):
-    tiki_explain_enabled = get_tiki_explain(request)
+    enable_tiki_explain = is_tiki_explain_enabled(request)
 
     response = HttpResponse()
-    set_tiki_explain(response, not tiki_explain_enabled)
+    set_tiki_explain(response, not enable_tiki_explain)
     return tiki_response(response)
 
 
