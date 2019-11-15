@@ -29,6 +29,7 @@ import collections
 import signal
 import time
 
+
 class Sampler(object):
     """
     A simple stack sampler for low-overhead CPU profiling: samples the call
@@ -60,9 +61,12 @@ class Sampler(object):
         self._stack_counts[stack] += 1
         signal.setitimer(signal.ITIMER_VIRTUAL, self.interval)
 
-    def _format_frame(self, frame):
-        return '{}({})'.format(frame.f_code.co_name,
-                               frame.f_globals.get('__name__'))
+    @staticmethod
+    def _format_frame(frame):
+        return '{}({})'.format(
+            frame.f_code.co_name,
+            frame.f_globals.get('__name__')
+        )
 
     def output_stats(self):
         if self._started is None:

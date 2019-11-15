@@ -13,30 +13,37 @@ from .utils import (
     get_tiki_token_or_false_for_tikibar_view,
     ssl_required,
 )
-import json, hashlib, itertools, time, os
+
+from constants import FIELD_DURATION
+
+import hashlib
+import itertools
+import json
+import os
+import time
 
 from .sql_utils import reformat_sql
 
-TIKI_ANGER_THRESHOLD = 500 # 500ms
+TIKI_ANGER_THRESHOLD = 500  # 500ms
 
 TIKI_BAR_COLORS = ['#8adb1e', '#1c4dcb', '#b21ccb', '#f53522', '#f5aa22', '#e7f021']
+
 
 def tiki_response(response):
     response['x-suppress-tikibar'] = '1'
     setattr(response, 'xframe_option', 'EXEMPT')
     return response
 
+
 @ssl_required
 def tikibar_settings(request):
     if not tikibar_feature_flag_enabled(request):
-        raise Http404, 'Tikibar is turned off'
+        raise Http404('Tikibar is turned off')
     if not request.user or not request.user.is_staff:
-        raise Http404, 'Staff required'
+        raise Http404('Staff required')
     is_active = bool(get_tiki_token_or_false(request))
-    t = template.loader.get_template('tikibar/tikibar_settings.html')
-    return HttpResponse(t.render(template.RequestContext(request, {
-        'is_active': is_active,
-    })))
+    settings_template = template.loader.get_template('tikibar/tikibar_settings.html')
+    return HttpResponse(settings_template.render(template.RequestContext(request, {'is_active': is_active})))
 
 
 @ssl_required
@@ -83,16 +90,17 @@ def tikibar(request):
         data['request_history'] = request_history
         data['release_hash'] = data['release'].split('-')[-1]
         data['bars'] = []
+        data['queries'] = data.get('queries', []) or []
 
         now = time.time()
         for row in data['request_history']:
             row['ago'] = now - row['t']
-            row['ms'] = row['d'] * 1000
+            row['ms'] = row[FIELD_DURATION] * 1000
 
         # Massage data
         def expand_durations(obj):
             try:
-                if isinstance(obj, dict) and obj.keys() > 0 and obj.keys()[0] == 'd':
+                if isinstance(obj, dict) and obj.keys() > 0 and obj.keys()[0] == FIELD_DURATION:
                     return duration(obj)
                 elif isinstance(obj, dict):
                     return dict([(key, expand_durations(value)) for key, value in obj.items()])
@@ -108,7 +116,7 @@ def tikibar(request):
         total_time = data['total_time']['duration']
 
         queries, total_query_time = format_queries(
-            data.get('queries', {}),
+            data['queries'],
             total_time,
             data['bars']
         )
@@ -221,7 +229,6 @@ def add_bars_to_items(items, unique_keyname):
 
 @ssl_required
 def tikibar_on(request):
-
     if not request.user or not request.user.is_staff:
         return HttpResponse('You must be signed in as staff')
 
@@ -233,14 +240,16 @@ def tikibar_on(request):
         t = template.loader.get_template('tikibar/tikibar_on.html')
         return HttpResponse(t.render(template.RequestContext(request, {})))
 
+
 @ssl_required
 def tikibar_off(request):
     if not tikibar_feature_flag_enabled(request):
-        raise Http404, 'Tikibar is turned off'
+        raise Http404('Tikibar is turned off')
+
     if request.method == 'POST':
-        response = HttpResponse("""
-            Tikibar is now off <a href="/">Go home</a><script>window.parent.postMessage(JSON.stringify({'tiki_msg_type': 'hide'}), '*');</script>
-        """)
+        go_home_link = '<a href="/">Go home</a>'
+        hide_tikibar_script = '<script>window.parent.postMessage(JSON.stringify({"tiki_msg_type": "hide"}), "*");</script>'  # noqa
+        response = HttpResponse('Tikibar is now off {}{}'.format(go_home_link, hide_tikibar_script))
         # response.delete_cookie('tikibar_active')
         set_tikibar_disabled_by_user(response)
         return tiki_response(response)
@@ -248,11 +257,12 @@ def tikibar_off(request):
         t = template.loader.get_template('tikibar/tikibar_off.html')
         return tiki_response(HttpResponse(t.render(template.RequestContext(request, {}))))
 
+
 def duration(obj):
     return {
-        'start': obj['d'][0],
-        'end': obj['d'][1],
-        'duration': (obj['d'][1] - obj['d'][0]) * 1000
+        'start': obj[FIELD_DURATION][0],
+        'end': obj[FIELD_DURATION][1],
+        'duration': (obj[FIELD_DURATION][1] - obj[FIELD_DURATION][0]) * 1000
     }
 
 
@@ -268,23 +278,21 @@ def set_token_cross_domain(request):
     if not nonce:
         return HttpResponse('Could not set, no nonce')
     try:
-        signer = signing.TimestampSigner()
-        key = signer.unsign(nonce, max_age=10).split(r'tikibar-nonce:')[1]
         # We return a 1x1 transparent gif, since we're triggered by an <img src="">
         gif = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".decode('base64')
-        response = HttpResponse(gif, content_type = 'image/gif')
+        response = HttpResponse(gif, content_type='image/gif')
         set_tikibar_active_on_response(response, request)
         return response
-    except:
+    except Exception:
         return HttpResponse('Could not set, invalid nonce')
 
 
 @ssl_required
 def tikibar_set_for_api_domain(request):
     if not settings.TIKIBAR_SETTINGS.get('api_domain'):
-        raise Http404, 'No API domain defined'
+        raise Http404('No API domain defined')
     if not tikibar_feature_flag_enabled(request):
-        raise Http404, 'Tikibar is turned off'
+        raise Http404('Tikibar is turned off')
     if not request.user or not request.user.is_staff:
         return HttpResponse('You must be signed in as staff')
     nonce = os.urandom(16).encode('hex')
