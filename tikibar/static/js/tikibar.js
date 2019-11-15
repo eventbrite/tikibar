@@ -58,7 +58,8 @@ function start($) {
                 position: 'absolute',
                 width: '100%',
                 top: '60px',
-                margin: 0
+                margin: 0,
+                minHeight:'100%',
             });
             div.css({
                 marginTop: '-60px'

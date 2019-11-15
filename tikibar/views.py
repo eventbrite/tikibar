@@ -12,6 +12,8 @@ from .utils import (
     tikibar_feature_flag_enabled,
     get_tiki_token_or_false_for_tikibar_view,
     ssl_required,
+    is_tiki_explain_enabled,
+    set_tiki_explain,
 )
 
 from constants import FIELD_DURATION
@@ -151,6 +153,8 @@ def tikibar(request):
         if total_time > TIKI_ANGER_THRESHOLD:
             data['angry'] = True
 
+    data['explain_enabled'] = is_tiki_explain_enabled(request)
+
     if request.GET.get('render'):
         template_name = 'tikibar.html'
         if request.GET.get('template') == 'minibar':
@@ -188,13 +192,14 @@ def format_queries(input_queries, total_time, bars):
     total_query_time = 0.0
     for metric_type in input_queries:
         metric_timing = 0.0
-        for query_type, val, needs_format, timing in input_queries.get(metric_type, []):
+        for query_type, val, needs_format, timing, explain_data in input_queries.get(metric_type, []):
             if needs_format:
                 val = reformat_sql(val)
             queries.append({
                 'sql': val,
                 'type': query_type,
                 'timing': timing,
+                'explain_data': explain_data,
             })
             metric_timing += timing['duration']
         bars.append({
@@ -256,6 +261,15 @@ def tikibar_off(request):
     else:
         t = template.loader.get_template('tikibar/tikibar_off.html')
         return tiki_response(HttpResponse(t.render(template.RequestContext(request, {}))))
+
+
+@ssl_required
+def toggle_explain_queries(request):
+    enable_tiki_explain = is_tiki_explain_enabled(request)
+
+    response = HttpResponse()
+    set_tiki_explain(response, not enable_tiki_explain)
+    return tiki_response(response)
 
 
 def duration(obj):

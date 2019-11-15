@@ -14,9 +14,11 @@ from django.http import HttpResponsePermanentRedirect
 TIKIBAR_DATA_STORAGE_TIMEOUT = 3000  # time to store cache data
 TIKI_COOKIE = 'tikibar_active'
 TIKIBAR_VIEW_COOKIE_NAME = 'tikiok'
+TIKI_EXPLAIN = 'tikibar_explain_queries'
 TIKI_SALT_HTTPS = 'tiki-salt-extra-https'
 TIKI_COOKIE_ENABLED_EXPIRATION = 24 * 60 * 60  # 24 hours, in seconds
 TIKI_COOKIE_DISABLED_EXPIRATION = 30 * 24 * 60 * 60  # 30 days, in seconds
+TIKI_EXPLAIN_EXPIRATION = TIKI_COOKIE_ENABLED_EXPIRATION
 TIKIBAR_DISABLED_STRING = 'disabled'
 
 
@@ -140,6 +142,27 @@ def set_tikibar_disabled_by_user(response):
         TIKI_COOKIE,
         TIKIBAR_DISABLED_STRING,
         secure=True,
+    )
+
+
+def is_tiki_explain_enabled(request):
+    try:
+        tiki_explain_cookie = request.get_signed_cookie(
+            TIKI_EXPLAIN,
+            max_age=TIKI_EXPLAIN_EXPIRATION
+        )
+    except KeyError:
+        tiki_explain_cookie = '0'
+
+    return tiki_explain_cookie == '1'
+
+
+def set_tiki_explain(response, value):
+    # Value should be an integer or a boolean
+    response.set_signed_cookie(
+        TIKI_EXPLAIN,
+        int(value),
+        domain=settings.TIKIBAR_SETTINGS.get('domain'),
     )
 
 

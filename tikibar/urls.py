@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^on/$', views.tikibar_on),
     url(r'^set-for-api-domain/$', views.tikibar_set_for_api_domain),
     url(r'^off/$', views.tikibar_off),
+    url(r'^toggle-explain-queries/$', views.toggle_explain_queries),
 ]

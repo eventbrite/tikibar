@@ -304,6 +304,14 @@ jQuery(function($) {
         window.parent.postMessage(JSON.stringify({'tiki_msg_type': 'hide'}), '*');
         return false;
     });
+    $('#js-tiki-toggle-explains').click(function(ev) {
+        $.ajax({
+            url: '/tikibar/toggle-explain-queries/',
+            success: function() {
+                window.parent.location.reload();
+            }
+        });
+    });
 });
 </script>
 <style>
@@ -392,6 +400,28 @@ html {
     position: absolute;
     top: 0;
     left: 0;
+}
+#tikibar .tiki-glasses {
+    z-index: 99999999;
+    top: 4px;
+    height: 42px;
+    width: 30px;
+    margin: -1px 0 0 -37px;
+    position: relative;
+    background-repeat: no-repeat;
+    float: left;
+    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABHNCSVQICAgIfAhkiAAABLRJREFUSIntlEts1FUYxc99/N/zHubR0tJQihrkqTwXYogGIoKJIS7csjOuDCtX7o0QXbnQjVswBhNNVAJYEwOVWFpLW16ltJ2Zdphpmff8X/deF9SmC6Jrk/5W3+ac+325JwfYYIMN/u+QtYEQ0zacF3pSfXst3d5rG3YPIZSGIvDabututVm5sdKo/CWkWH6eEaUskYqmd2fiuf227uzWuGZJpaTrdypu4I4vrhTHWt3GtFKqAwB8VWfu237406Hs9uOZSGaIEsKg1Lr1iKp1asvVVmX06vhP5/zQu7P+Uc607W/sO3k+F8sfTJixrFKKKCkBQkAIAQhRlXZ19nFl9vrI1PA5BVVnjPHU0d1vfn1o8PBZmxqbKGVUUAIXAh4ECGNghBKDcDtlJ7cNZAdPLbeqbT/0u4zyTCqaOXH60Htf9cV6jxhUiyjOiAcJFwKKEjDGQIQkNjOSm5P9ryTi6QMLldmrPJfs3f9i744TwvdBGENHBeA5YN+pbeioJhqjEnN/lpAy4xCui7ST7t+z9eCFlUb1MQDEY+m+lJmIQylA11GnNex6Zwhsk4Sscox9fx8JLQHieVAiRF+s93AmlnuVp2PZ47ZmxUPpQTCK1B4HZz56CzHbAfwuiscKuPZjAYVvGkjoNhCGJKI7ERXBTgAwDRsUgNI4aqSGs1+cQTaXBg8kGmIZ2q4aRs4/Qob0Q7guLM1yUk76XRoxY8ehAMoY6u06Xnv/AKKRCHggsFC4gmJxGNEjHfjRBkIlAQAG1yGVgoKCzjQoKRFIgZdPDCKb3wQTFiqVUczd/xZB/wr0HU0EUqxlIuGkjlIQQlcDBDdwYeQJXNnB/dYtlBvjKMxdhgpXoKUDhKtinWsIVYhQCliaCQAQSsLIUnRFG0XvIebrf2B+4TK89jysTIgg9KGwFlhK/5mUlLB0C3cmJjHr38W8P42yOwYStaA6dbhFDWo16SY3kEvmkUvlYXHjmROhmLtXwHzwADP+FJbcCXiOBHHraM0KcK5BSrl2Ncsm829vSW8ZEmFAdMPE4+lFRAYMkBxFl3cRdHQ8uBiFUe4BlwBVSi7WShPDd375+GFp6lLSTvRHzGieUkYrD1sgeYFIj4W6UQfhOgq/GnBv9YP6FBphIICarT4aYwY3cwOZwWMclEshoFwNxdtPUL63gupdH0tXouCFARBfwSAMy83q3NXJnz9caS9/1/W7E6WnxcmexObXI7qT5pqO8l91FMbLqM50sPQ7h3d7CzTfgiYAzhi80AsmFsY+Y22vVbJMZygfz79EAaggBAt00CcOsJCA0U0i7LiIchNSyXB4+ton5frSJeDZh/mhv1Dr1JpD2aGTHISpANAaDjAfhVHLQnUldAkYmg4AGJsbvXi3NPU5k1LUF1cKNywzcihuJXI60xhRCioIQIQElRK2ZqDtteo3Z258+WDp3gUA/vrmarqNqZbXoploZqej2bYMAkBIkFDAZBo0riEIXH+6NDkyMnPzg1CGJbJOb9qGc3Rzsu8YAYFUUmic637gdxtuc77afPKDUqr8vJ5e163JdDR9Om7Ftxqa4YRCBJRQrpSUhaeF6x2v/RsA9989Nthggw3+g78B+kA4AwndZrgAAAAASUVORK5CYII=')
+}
+#tikibar .tiki-glasses-angry {
+    z-index: 99999999;
+    top: 4px;
+    height: 42px;
+    width: 30px;
+    margin: -1px 0 0 -37px;
+    position: relative;
+    background-repeat: no-repeat;
+    float: left;
+    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABHNCSVQICAgIfAhkiAAABJpJREFUSIntlMtv1FUUx7/3/t4z0+m0v7HzKm0J0/IyBA0E2goBxShgjAsWJqLxlRhjTPwLXJm40Lg0unKDKx9BLcFIUVAQ0PJoBVpKaYeWTgfazvym7cz8HvfhoiClC90ZTfrZnXvuud+TnO+5wAorrPB/hywNFKrYrcnskw/Fkt12XTyuKir1mccmZyb+yBVGfpivli/83WMhM7KxLZndk4m3bjE1XWeci3LVcaadwpnc1PXegAf55cJm18OPf/Do6q1vUC40wdiy9ggUTUNuJnfux4HvX5+vli8vTUesaPuuzU9/2p7s2MVdjwj+YD3VNBBN4/2584d+Hjj2jhDcIQCwv/PAkayd3cd9D4RSUNNENXAhhIClm1C4BPc9AECF1Zxvfv/qxeL8dA8A1IVi3c/vfuWwyWlcCgHVsuAKhoD50FQdpqKBVauLDagqbs3l+74+9fl2NV6f2LE2s3GfPzcHoihwqQSdvIjnGg2QK1dwJrsGI7QFiTobrFZDWLVij6174jufB4JISMXQFZNRSClAwyHcKYzgqVAVmVwOw5kETgSNSCY7ICoVCMaQDjVtScbSe5X25o1vt9mtXYIxSNNAvTOMj7ZnsaYlieYNLdiaH0Ph1jWM162CQVVASlSDGvzAJyCgumEiqllQLQvThRv4cLON7rY00puy2OQ6SJbGcbzMEGtMQt4dYbFS9Gg03LAXEiCUwlko4bXVMVDLRJBqwqnekzg3NY1tI0OoTA6BaBoAwNJMSEhIKaHTxbNACuyuZ0jVhSHSCQwPDaNndByJi/1ITQzAE/fnHgvbu9WlBvICD+mbY0DEwlxPD2qOg0vjE9hBKELVMuRdK2qKCib4oitVfVGYB0jdKQClBgT9l1AZHUX/WA4pzhH1q7jNfKhLlugvYck5QkYYF84OoPP8eUzpOiaKRcSoglFKUInYsAIfGgBTM9HUkAAhBJZmAAB0VUd/fhr7RwYwaxi4WSwiJIGcquK2FoJKVYDz+04PmHfrXhA2Qvhk1SOYcT2kikU0KQqiCsVpuw2x5rUIXBcAUFqYHTs3+NOrv17uPTjjFAYBQPg+Lm3Yid5AwJ6dRVwCGVXBqGpgYf1OsLtbAQB+UBsnzfHWNw90vfAxc2tggoMbGpz8DayZGIDDfRRTHQi3bALzXERVE67vVg+d/myDx7ybAKAqWuJg90tDYaMu5msU5cocmq+fBauW4ERseO3bENZDUAMOXV30w+G+L19WFtz5kYSd2RM16tKUEHDfgxqJodK8DiyzHlp9E4JaBVHNAqUUJwaPv3t7rnDkXvdCikq5Wi53pNY9QxgHoQRuOgsvsx40sRqSMRiSwLjrhdz0WF/f2G9vKVJKd3jy6hexqN0Zj8TbFEKhEwrCOAjjMKAgpJnwmOf+cu3E+4P5K+9hGU611OdUnUq6IdMV0Sxd4QJgDJokCGsmVKpASomh/NWTxy4f3S+ldB/4qxsi9rPJ+mQnJRRSSk6pogvBvVpQGx2fyR3lgheWiy6FEtq4ym7dFzJCHQpVTSF5QEFVASGmSvkzpUrx27+r/9cg/3xlhRVW+A/zJ1T5EZir8OoUAAAAAElFTkSuQmCC')
 }
 #tikibar h1 .eyes {
     position: absolute;
@@ -557,6 +587,9 @@ html {
     position: absolute;
     bottom: 10px;
     right: 10px;
+{% if tiki.explain_enabled %}
+    transform: scaleX(-1);
+{% endif %}
 }
 
 #tikibar .tikibasement h2 {
@@ -701,6 +734,29 @@ html {
     font-weight: bold;
     margin: 0;
 }
+
+#tikibar .tiki-query-clickable {
+    cursor: pointer;
+}
+
+#tikibar .tiki-query-clickable:hover {
+    background-color: #e2761f;
+}
+
+#tikibar .tiki-explain-table {
+    background-color:#9c3f5d;
+}
+
+#tikibar .tiki-explain-table th {
+    background-color:#70284a;
+
+}
+
+#tikibar .tiki-explain-table td {
+    border:1px solid #c8586c;
+}
+
+
 </style>
 </head>
 <body>
@@ -715,6 +771,9 @@ html {
     </div>
 
     <div class="tikifacade">
+        {% if tiki.explain_enabled %}
+        <span {% if tiki.angry %} class="tiki-glasses-angry" {% else %} class="tiki-glasses" {% endif %}></span>
+        {% endif %}
         <h1{% if tiki.angry %} class="tiki-angry"{% endif %}><span class="eyes eye-left"></span><span class="eyes eye-right"></span><em>Tikibar</em></h1>
 
         <a href="#tiki-server-time" class="tiki-set tiki-js-toggle">
@@ -804,7 +863,12 @@ html {
             </thead>
             <tbody>
                 {% for query in tiki.queries %}
-                <tr>
+                <tr
+                    {% if query.explain_data %}
+                    class="tiki-query-clickable"
+                    onclick="$(this).next().toggle(); transmitSize();"
+                    {% endif %}
+                >
                     <td>{{ query.timing.duration|floatformat:2 }}<span class="tiki-qualifier">ms</span></td>
                     <td class="tiki-sql" style="border-color: #{{ query.color }};">{{ query.sql|safe }}</td>
                     <td class="tiki-timing-graph">
@@ -813,6 +877,42 @@ html {
                     </td>
                     <td class="tiki-type">{{ query.type }}</td>
                 </tr>
+                {% if query.explain_data %}
+                <tr style="background-color:#b25f1c; display:none">
+                    <td style="background-color: #d36e1d">EXPLAIN</td>
+                    <td class="tiki-sql" style="border-color: #{{ query.color }};">
+                        <table class="tiki-explain-table">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Select Type</th>
+                                <th>Table</th>
+                                <th>Partition</th>
+                                <th>Type</th>
+                                <th>Possible Keys</th>
+                                <th>Key</th>
+                                <th>Key Len</th>
+                                <th>Ref</th>
+                                <th>Rows</th>
+                                <th>Filtered</th>
+                                <th>Extra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for step in query.explain_data %}
+                            <tr>
+                            {% for col in step %}
+                                <td>{{ col }}</td>
+                            {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                    </td>
+                    <td style="background-color: #d36e1d"></td>
+                    <td class="tiki-type" style="background-color: #d36e1d"></td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
          </table>
@@ -1034,6 +1134,17 @@ html {
         <form id="js-tiki-hide">
             <p>
                 <input class="tiki-submit" type="submit" value="Hide the Tikibar on this page">
+            </p>
+        </form>
+        <form id="js-tiki-toggle-explains">
+            <p>
+                <input class="tiki-submit" type="button"
+                    {% if tiki.explain_enabled %}
+                        value="Turn off query explains"
+                    {% else %}
+                        value="Turn on query explains"
+                    {% endif %}
+                >
             </p>
         </form>
 
