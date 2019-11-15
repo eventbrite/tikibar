@@ -151,7 +151,6 @@ class ToolbarMetricsContainer(object):
         # If the metrics seem too long, start dropping parts to try and fit
         if len(repr(self.metrics)) > self.max_size:
             self.metrics["loglines"] = [("ERROR", "Logs too big for memcached")]
-        if len(repr(self.metrics)) > self.max_size:
             self.metrics["queries"]["SQL"] = [
                 (
                     query_type,

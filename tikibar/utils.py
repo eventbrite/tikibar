@@ -201,7 +201,7 @@ def _should_show_tikibar_for_request(request):
     # Cache the value of this on the request, so it isn't calculated every time.
     if not hasattr(request, '_show_tikibar_for_request'):
         if (
-            hasattr(request, '_collect_tikibar_data_for_request') 
+            hasattr(request, '_collect_tikibar_data_for_request')
             and request._collect_tikibar_data_for_request
         ):
             request._show_tikibar_for_request = tikibar_feature_flag_enabled(request)
@@ -269,5 +269,3 @@ def ssl_required(function):
         return wraps(view_func)(_wrapped_view)
 
     return decorator(function)
-
-

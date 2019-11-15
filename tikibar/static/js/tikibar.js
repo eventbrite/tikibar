@@ -65,8 +65,8 @@ function start($) {
                 marginTop: '-60px'
             });
 
-            // Recieve messages from the child frame
-            window.addEventListener('message', this.recieve_message.bind(this));
+            // Receive messages from the child frame
+            window.addEventListener('message', this.receive_message.bind(this));
 
             // Listen to jQuery Ajax calls
             $(document).bind('ajaxComplete', this.on_ajax_request.bind(this));
@@ -95,7 +95,7 @@ function start($) {
             }
         }
 
-        TikibarHost.prototype.recieve_message = function(event) {
+        TikibarHost.prototype.receive_message = function(event) {
             var originDomain = extractDomain(event.origin);
             var currentDomain = extractDomain(location.host);
             var data = event.data;
