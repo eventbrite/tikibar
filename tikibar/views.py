@@ -263,7 +263,6 @@ def tikibar_off(request):
         return tiki_response(HttpResponse(t.render(template.RequestContext(request, {}))))
 
 
-<<<<<<< HEAD
 @ssl_required
 def toggle_explain_queries(request):
     enable_tiki_explain = is_tiki_explain_enabled(request)
@@ -273,8 +272,6 @@ def toggle_explain_queries(request):
     return tiki_response(response)
 
 
-=======
->>>>>>> [PATCH] Several fixes without relevant code changes (#32)
 def duration(obj):
     return {
         'start': obj[FIELD_DURATION][0],
