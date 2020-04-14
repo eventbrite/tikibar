@@ -1,3 +1,4 @@
+import functools
 import json
 import os
 import resource
@@ -8,7 +9,10 @@ import uuid
 from django.conf import settings
 from django.core.cache import cache
 from sampler import Sampler
+import six
 
+from common.soa import ebsoa_client
+from pysoa.client.client import Client as PySOAClient
 
 from constants import FIELD_DURATION
 from .utils import (
@@ -63,6 +67,23 @@ class TikibarMiddleware(object):
 
         if not tikibar_feature_flag_enabled(request):
             return None
+
+        if settings.TIKIBAR_SETTINGS.get('debug_permissions'):
+            # Patch PySOA Client's send_request
+            if not hasattr(PySOAClient, '_original_send_request'):
+                PySOAClient._original_send_request = PySOAClient.send_request
+
+                @functools.wraps(PySOAClient._original_send_request)
+                def wrapper(self, *args, **kwargs):
+                    if (
+                        'context' not in kwargs
+                        or kwargs['context'] is None
+                    ):
+                        kwargs['context'] = {}
+                    kwargs['context'].setdefault(u'debug', {})[u'permissions'] = True
+                    return self._original_send_request(*args, **kwargs)
+                PySOAClient.send_request = wrapper
+
 
         toolbar = get_toolbar()
         if toolbar.is_active():
@@ -120,6 +141,24 @@ class TikibarMiddleware(object):
                 toolbar.add_stack_samples(request.sampler.output_stats())
                 toolbar.add_singular_metric('stack_sample_count', request.sampler.sample_count())
                 request.sampler.stop()
+
+            if settings.TIKIBAR_SETTINGS.get('debug_permissions'):
+                # Unpatch PySOA client
+                PySOAClient.send_request = PySOAClient._original_send_request
+                delattr(PySOAClient, '_original_send_request')
+                client = ebsoa_client.get_client()
+                try:
+                    request_permissions_response = client.call_action(
+                        u'cerberus',
+                        u'get_request_permissions',
+                        body={
+                            u'correlation_id': six.text_type(request.correlation_id),
+                        },
+                    )
+                    request_entity_perms = request_permissions_response.body['request_entity_perms']
+                except client.CallActionError as e:
+                    request_entity_perms = []
+                toolbar.add_permissions(request_entity_perms)
 
             toolbar.write_metrics()
 

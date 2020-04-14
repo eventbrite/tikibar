@@ -811,6 +811,13 @@ html {
             <p id="tiki-js-ajax-counter">0</p>
         </a>
 
+        {% if tiki.request_entity_permissions %}
+        <a href="#tiki-permissions" class="tiki-set tiki-js-toggle">
+            <h2 class="tiki-set-header">Permissions</h2>
+            <p>{{ tiki.request_entity_permissions|length }}</p>
+        </a>
+        {% endif %}
+
         {% if tiki.stack_samples %}
         <a href="#tiki-flame-graph" class="tiki-set tiki-js-toggle">
             <h2 class="tiki-set-header">Flame Graph</h2>
@@ -968,6 +975,35 @@ html {
         </ul>
     </div><!-- /.tikibasement -->
 
+	{% if tiki.request_entity_permissions %}
+    <div class="tikibasement" id="tiki-permissions">
+        <h2>Permission checks</h2>
+		<table>
+			<tr><th>Entity</th><th>Allowed</th><th>Denied</th></tr>
+			{% for entity_perm in tiki.request_entity_permissions %}
+			<tr>
+				<td>
+					{{ entity_perm.entity.type }}
+					{% if entity_perm.entity.id %}
+					- {{ entity_perm.entity.id }}
+					{% endif %}
+				</td>
+				<td><ul>
+					{% for allowed in entity_perm.allowed %}
+					<li>{{ allowed }}</li>
+					{% endfor %}
+				</ul></td>
+				<td><ul>
+					{% for denied in entity_perm.denied %}
+					<li>{{ denied }}</li>
+					{% endfor %}
+				</ul></td>
+			</tr>
+			{% endfor %}
+		</table>
+    </div><!-- /.tikibasement -->
+	{% endif %}
+
     {% if tiki.stack_samples %}
     <div class="tikibasement" id="tiki-flame-graph">
         <h2>Flame Graph</h2>
@@ -1032,7 +1068,7 @@ html {
     var root = new Node('root');
     var frames_counts = lines.map(function (val) {
         var regex = /(.*) (.*)/g;
-        var matches = regex.exec(val);        
+        var matches = regex.exec(val);
         if (matches) {
             var frames = matches[1].split(";");
             var frames_length = frames.length
