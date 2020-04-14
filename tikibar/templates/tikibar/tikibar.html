@@ -756,6 +756,9 @@ html {
     border:1px solid #c8586c;
 }
 
+#tikibar #tiki-permissions table tbody tr:nth-child(even) td {
+	background-color: rgba(255, 255, 255, 0.1);
+}
 
 </style>
 </head>
@@ -979,27 +982,28 @@ html {
     <div class="tikibasement" id="tiki-permissions">
         <h2>Permission checks</h2>
 		<table>
-			<tr><th>Entity</th><th>Allowed</th><th>Denied</th></tr>
+			<thead>
+				<tr><th>Entity</th><th>Allowed</th><th>Denied</th></tr>
+			</thead>
+			<tbody>
 			{% for entity_perm in tiki.request_entity_permissions %}
 			<tr>
 				<td>
-					{{ entity_perm.entity.type }}
-					{% if entity_perm.entity.id %}
-					- {{ entity_perm.entity.id }}
-					{% endif %}
+					{{ entity_perm.entity.type }}{% if entity_perm.entity.id %}: {{ entity_perm.entity.id }}{% endif %}
 				</td>
-				<td><ul>
+				<td class="allowed"><ul>
 					{% for allowed in entity_perm.allowed %}
 					<li>{{ allowed }}</li>
 					{% endfor %}
 				</ul></td>
-				<td><ul>
+				<td class="denied"><ul>
 					{% for denied in entity_perm.denied %}
 					<li>{{ denied }}</li>
 					{% endfor %}
 				</ul></td>
 			</tr>
 			{% endfor %}
+			</tbody>
 		</table>
     </div><!-- /.tikibasement -->
 	{% endif %}
