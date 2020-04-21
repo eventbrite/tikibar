@@ -147,6 +147,9 @@ class ToolbarMetricsContainer(object):
     def add_stack_samples(self, samples):
         self.metrics['stack_samples'] = samples
 
+    def add_permissions(self, request_entity_permissions):
+        self.metrics['request_entity_permissions'] = request_entity_permissions
+
     def write_metrics(self):
         # If the metrics seem too long, start dropping parts to try and fit
         if len(repr(self.metrics)) > self.max_size:

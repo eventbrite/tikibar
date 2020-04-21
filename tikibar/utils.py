@@ -74,8 +74,20 @@ def get_tiki_token_or_false_for_tikibar_view(request):
 
 def tikibar_feature_flag_enabled(request):
     try:
+        args = (request, )
+        admin_cookie = request.COOKIES.get('admin_user')
+        if admin_cookie:
+            import urlparse
+            from ebapps.ebauth import superuser
+            from ebapps.ebauth.models import User
+            admin_cookie = urlparse.unquote(admin_cookie)
+            if superuser.validate_admin_switchto_cookie(admin_cookie):
+                parts = superuser.parse_admin_switchto_cookie(admin_cookie)
+                admin_user = User.objects.get(email=parts['email'])
+                args += (admin_user, )
+
         from gargoyle import gargoyle
-        return gargoyle.is_active(settings.TIKIBAR, request)
+        return gargoyle.is_active(settings.TIKIBAR, *args)
     except ImportError:
         if hasattr(settings, 'ENABLE_TIKIBAR'):
             return settings.ENABLE_TIKIBAR
