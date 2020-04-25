@@ -68,23 +68,6 @@ class TikibarMiddleware(object):
         if not tikibar_feature_flag_enabled(request):
             return None
 
-        if settings.TIKIBAR_SETTINGS.get('debug_permissions'):
-            # Patch PySOA Client's send_request
-            if not hasattr(PySOAClient, '_original_send_request'):
-                PySOAClient._original_send_request = PySOAClient.send_request
-
-                @functools.wraps(PySOAClient._original_send_request)
-                def wrapper(self, *args, **kwargs):
-                    if (
-                        'context' not in kwargs
-                        or kwargs['context'] is None
-                    ):
-                        kwargs['context'] = {}
-                    kwargs['context'].setdefault(u'debug', {})[u'permissions'] = True
-                    return self._original_send_request(*args, **kwargs)
-                PySOAClient.send_request = wrapper
-
-
         toolbar = get_toolbar()
         if toolbar.is_active():
             if settings.TIKIBAR_SETTINGS.get('enable_profiler'):
@@ -100,6 +83,22 @@ class TikibarMiddleware(object):
                 request.stime_start = rusage.ru_stime
             if not hasattr(request, 'maxrss_start'):
                 request.maxrss_start = rusage.ru_maxrss
+
+            if settings.TIKIBAR_SETTINGS.get('debug_permissions'):
+                # Patch PySOA Client's send_request
+                if not hasattr(PySOAClient, '_original_send_request'):
+                    PySOAClient._original_send_request = PySOAClient.send_request
+
+                    @functools.wraps(PySOAClient._original_send_request)
+                    def wrapper(self, *args, **kwargs):
+                        if (
+                            'context' not in kwargs
+                            or kwargs['context'] is None
+                        ):
+                            kwargs['context'] = {}
+                        kwargs['context'].setdefault(u'debug', {})[u'permissions'] = True
+                        return self._original_send_request(*args, **kwargs)
+                    PySOAClient.send_request = wrapper
 
         return None
 
@@ -123,6 +122,11 @@ class TikibarMiddleware(object):
         if not tikibar_feature_flag_enabled(request):
             return response
 
+        # Ensure PySOA client is unpatched
+        if hasattr(PySOAClient, '_original_send_request'):
+            PySOAClient.send_request = PySOAClient._original_send_request
+            delattr(PySOAClient, '_original_send_request')
+
         toolbar = get_toolbar()
         # hasattr handles edge case where is_active is false in process_request but true here
         if toolbar.is_active() and hasattr(request, 'req_start_time'):
@@ -143,9 +147,6 @@ class TikibarMiddleware(object):
                 request.sampler.stop()
 
             if settings.TIKIBAR_SETTINGS.get('debug_permissions'):
-                # Unpatch PySOA client
-                PySOAClient.send_request = PySOAClient._original_send_request
-                delattr(PySOAClient, '_original_send_request')
                 client = ebsoa_client.get_client()
                 try:
                     request_permissions_response = client.call_action(
@@ -156,7 +157,7 @@ class TikibarMiddleware(object):
                         },
                     )
                     request_entity_perms = request_permissions_response.body['request_entity_perms']
-                except client.CallActionError as e:
+                except client.CallActionError:
                     request_entity_perms = []
                 toolbar.add_permissions(request_entity_perms)
 
