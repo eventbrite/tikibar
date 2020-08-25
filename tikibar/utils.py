@@ -9,6 +9,7 @@ import logging
 from functools import wraps
 
 from django.conf import settings
+from django.core import exceptions
 from django.http import HttpResponsePermanentRedirect
 
 TIKIBAR_DATA_STORAGE_TIMEOUT = 3000  # time to store cache data
@@ -88,7 +89,7 @@ def tikibar_feature_flag_enabled(request):
 
         from gargoyle import gargoyle
         return gargoyle.is_active(settings.TIKIBAR, *args)
-    except ImportError:
+    except (ImportError, exceptions.ObjectDoesNotExist):
         if hasattr(settings, 'ENABLE_TIKIBAR'):
             return settings.ENABLE_TIKIBAR
         if settings.DEBUG:
