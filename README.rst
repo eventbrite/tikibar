@@ -22,7 +22,7 @@ Getting Started
 To use Tikibar, you need to add it to your Django ``INSTALLED_APPS`` and then
 include the middleware (``tikibar.middleware.TikibarMiddleware``) in your
 Django middleware configuration.
-
+test
 
 Release Process
 ---------------
