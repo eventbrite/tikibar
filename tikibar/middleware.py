@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import functools
 import json
 import os
@@ -8,13 +9,13 @@ import uuid
 
 from django.conf import settings
 from django.core.cache import cache
-from sampler import Sampler
+from .sampler import Sampler
 import six
 
 from common.soa import ebsoa_client
 from pysoa.client.client import Client as PySOAClient
 
-from constants import FIELD_DURATION
+from .constants import FIELD_DURATION
 from .utils import (
     _should_show_tikibar_for_request,
     get_tiki_token_or_false,

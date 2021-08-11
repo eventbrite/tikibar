@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.core import signing
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django import template
@@ -16,7 +17,7 @@ from .utils import (
     set_tiki_explain,
 )
 
-from constants import FIELD_DURATION
+from .constants import FIELD_DURATION
 
 import hashlib
 import itertools

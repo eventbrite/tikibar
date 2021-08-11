@@ -24,6 +24,7 @@
 # This was adapted from
 # https://github.com/nylas/nylas-perftools/blob/master/stacksampler.py
 
+from __future__ import absolute_import
 import atexit
 import collections
 import signal
