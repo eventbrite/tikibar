@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.1 (2021-08-12)
+------------------
+- Revert "Removed CircleCI" (#50)
+- fixes for py3 compatibility (#49)
+- Removed CircleCI
+
 0.2.1 (2020-04-24)
 ------------------
 - Fixed a bug in PySOA client patch code.
