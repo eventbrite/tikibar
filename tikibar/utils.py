@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 import os
 import uuid
 
 try:
-    import urlparse
+    import six.moves.urllib.parse
 except ImportError:
     from urllib.parse import urlparse
 import logging
@@ -78,10 +79,10 @@ def tikibar_feature_flag_enabled(request):
         args = (request, )
         admin_cookie = request.COOKIES.get('admin_user')
         if admin_cookie:
-            import urlparse
+            import six.moves.urllib.parse
             from ebapps.ebauth import superuser
             from ebapps.ebauth.models import User
-            admin_cookie = urlparse.unquote(admin_cookie)
+            admin_cookie = six.moves.urllib.parse.unquote(admin_cookie)
             if superuser.validate_admin_switchto_cookie(admin_cookie):
                 parts = superuser.parse_admin_switchto_cookie(admin_cookie)
                 admin_user = User.objects.get(email=parts['email'])
@@ -266,8 +267,8 @@ def ssl_required(function):
             if request.is_secure():
                 return view_func(request, *args, **kwargs)
             if not settings.DEBUG:
-                parsed = urlparse.urlparse(request.build_absolute_uri())
-                https_url = urlparse.urlunparse((
+                parsed = six.moves.urllib.parse.urlparse(request.build_absolute_uri())
+                https_url = six.moves.urllib.parse.urlunparse((
                     'https',
                     parsed.netloc,
                     parsed.path,
