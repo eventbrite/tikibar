@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.3.3 (2021-08-23)
+------------------
+- [PATCH] Fix BoldKeywordFilter process() params (#54)
+
 0.3.1 (2021-08-12)
 ------------------
 - Revert "Removed CircleCI" (#50)
