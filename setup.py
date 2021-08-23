@@ -44,6 +44,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
+        'sqlparse~=0.3.1'
     ],
     license="BSD",
     zip_safe=False,

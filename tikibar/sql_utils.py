@@ -8,7 +8,7 @@ import re
 class BoldKeywordFilter:
     """sqlparse filter to bold SQL keywords"""
     @staticmethod
-    def process(stack, stream):
+    def process(stream):
         """Process the token stream"""
         for token_type, value in stream:
             is_keyword = token_type in T.Keyword
