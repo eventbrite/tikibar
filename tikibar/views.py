@@ -10,7 +10,7 @@ from .utils import (
     get_tiki_token_or_false,
     set_tikibar_active_on_response,
     set_tikibar_disabled_by_user,
-    tikibar_feature_flag_enabled,
+    tikibar_enabled,
     get_tiki_token_or_false_for_tikibar_view,
     ssl_required,
     is_tiki_explain_enabled,
@@ -40,7 +40,7 @@ def tiki_response(response):
 
 @ssl_required
 def tikibar_settings(request):
-    if not tikibar_feature_flag_enabled(request):
+    if not tikibar_enabled(request):
         raise Http404('Tikibar is turned off')
     if not request.user or not request.user.is_staff:
         raise Http404('Staff required')
@@ -51,7 +51,7 @@ def tikibar_settings(request):
 
 @ssl_required
 def tikibar(request):
-    if not tikibar_feature_flag_enabled(request):
+    if not tikibar_enabled(request):
         return tiki_response(HttpResponse('Tikibar is turned off'))
 
     # Check for a HTTPS-only cookie called 'tikiok', which allows
@@ -249,7 +249,7 @@ def tikibar_on(request):
 
 @ssl_required
 def tikibar_off(request):
-    if not tikibar_feature_flag_enabled(request):
+    if not tikibar_enabled(request):
         raise Http404('Tikibar is turned off')
 
     if request.method == 'POST':
@@ -288,7 +288,7 @@ def slasherize(path):
 
 @ssl_required
 def set_token_cross_domain(request):
-    # No check for tikibar_feature_flag_enabled() due to lack of auth cookies used by feature flag
+    # No check for tikibar_enabled() due to lack of auth cookies used by feature flag
     nonce = request.GET.get('nonce')
     if not nonce:
         return HttpResponse('Could not set, no nonce')
@@ -306,7 +306,7 @@ def set_token_cross_domain(request):
 def tikibar_set_for_api_domain(request):
     if not settings.TIKIBAR_SETTINGS.get('api_domain'):
         raise Http404('No API domain defined')
-    if not tikibar_feature_flag_enabled(request):
+    if not tikibar_enabled(request):
         raise Http404('Tikibar is turned off')
     if not request.user or not request.user.is_staff:
         return HttpResponse('You must be signed in as staff')

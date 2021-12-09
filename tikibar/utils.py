@@ -74,22 +74,14 @@ def get_tiki_token_or_false_for_tikibar_view(request):
     return False
 
 
-def tikibar_feature_flag_enabled(request):
+def tikibar_enabled(request):
     try:
-        args = (request, )
-        admin_cookie = request.COOKIES.get('admin_user')
-        if admin_cookie:
-            import six.moves.urllib.parse
-            from ebapps.ebauth import superuser
-            from ebapps.ebauth.models import User
-            admin_cookie = six.moves.urllib.parse.unquote(admin_cookie)
-            if superuser.validate_admin_switchto_cookie(admin_cookie):
-                parts = superuser.parse_admin_switchto_cookie(admin_cookie)
-                admin_user = User.objects.get(email=parts['email'])
-                args += (admin_user, )
+        from permissions.client import Client as PermissionClient
+        from permissions import constants as permission_constants
 
-        from gargoyle import gargoyle
-        return gargoyle.is_active(settings.TIKIBAR, *args)
+        perm_client = PermissionClient()
+        return perm_client.check_global_permission(permission_constants.PERMISSION_GLOBAL_ENGINEERING)
+
     except (ImportError, exceptions.ObjectDoesNotExist):
         if hasattr(settings, 'ENABLE_TIKIBAR'):
             return settings.ENABLE_TIKIBAR
@@ -218,7 +210,7 @@ def _should_show_tikibar_for_request(request):
             hasattr(request, '_collect_tikibar_data_for_request')
             and request._collect_tikibar_data_for_request
         ):
-            request._show_tikibar_for_request = tikibar_feature_flag_enabled(request)
+            request._show_tikibar_for_request = tikibar_enabled(request)
         else:
             request._show_tikibar_for_request = False
     return request._show_tikibar_for_request

@@ -19,7 +19,7 @@ from .constants import FIELD_DURATION
 from .utils import (
     _should_show_tikibar_for_request,
     get_tiki_token_or_false,
-    tikibar_feature_flag_enabled,
+    tikibar_enabled,
     set_tikibar_active_on_response,
     TIKIBAR_DATA_STORAGE_TIMEOUT,
 )
@@ -66,7 +66,7 @@ class TikibarMiddleware(object):
         # set the request on tikibar's context
         set_current_request(request)
 
-        if not tikibar_feature_flag_enabled(request):
+        if not tikibar_enabled(request):
             return None
 
         toolbar = get_toolbar()
@@ -107,7 +107,7 @@ class TikibarMiddleware(object):
     def process_view(request, view_func, view_args, view_kwargs):
         from .toolbar_metrics import get_toolbar
 
-        if not tikibar_feature_flag_enabled(request):
+        if not tikibar_enabled(request):
             return None
 
         toolbar = get_toolbar()
@@ -120,7 +120,7 @@ class TikibarMiddleware(object):
     def process_response(request, response):
         from .toolbar_metrics import get_toolbar
 
-        if not tikibar_feature_flag_enabled(request):
+        if not tikibar_enabled(request):
             return response
 
         # Ensure PySOA client is unpatched
