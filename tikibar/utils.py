@@ -80,7 +80,13 @@ def tikibar_enabled(request):
         from permissions import constants as permission_constants
 
         perm_client = PermissionClient()
-        return perm_client.check_global_permission(permission_constants.PERMISSION_GLOBAL_ENGINEERING)
+        permissions = (
+            permission_constants.PERMISSION_GLOBAL_ENGINEERING,
+            permission_constants.PERMISSION_GLOBAL_OPERATIONS,
+            permission_constants.PERMISSION_GLOBAL_RISK_FINANCE,
+        )
+
+        return perm_client.check_any_permission(permissions)
 
     except (ImportError, exceptions.ObjectDoesNotExist):
         if hasattr(settings, 'ENABLE_TIKIBAR'):
