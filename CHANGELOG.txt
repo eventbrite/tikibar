@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.3.4 (2022-01-11)
+------------------
+- replace deprecated gargoyle with tikibar permission group
+
 0.3.3 (2021-08-23)
 ------------------
 - [PATCH] Fix BoldKeywordFilter process() params (#54)
