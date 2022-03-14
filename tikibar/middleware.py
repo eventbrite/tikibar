@@ -66,6 +66,9 @@ class TikibarMiddleware(object):
         # set the request on tikibar's context
         set_current_request(request)
 
+        if settings.TEST_RUNNER:
+            return None
+
         if not tikibar_enabled(request):
             return None
 
@@ -107,6 +110,9 @@ class TikibarMiddleware(object):
     def process_view(request, view_func, view_args, view_kwargs):
         from .toolbar_metrics import get_toolbar
 
+        if settings.TEST_RUNNER:
+            return None
+
         if not tikibar_enabled(request):
             return None
 
@@ -119,6 +125,9 @@ class TikibarMiddleware(object):
     @staticmethod
     def process_response(request, response):
         from .toolbar_metrics import get_toolbar
+
+        if settings.TEST_RUNNER:
+            return None
 
         if not tikibar_enabled(request):
             return response
