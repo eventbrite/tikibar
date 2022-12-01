@@ -75,6 +75,10 @@ def get_tiki_token_or_false_for_tikibar_view(request):
 
 
 def tikibar_enabled(request):
+    path_info = request.META.get('PATH_INFO', '')
+    if any(path_info.startswith(exclude_path) for exclude_path in settings.TIKIBAR_SETTINGS.get('skip_urls')):
+        return False
+
     try:
         from permissions.client import Client as PermissionClient
         from permissions import constants as permission_constants
