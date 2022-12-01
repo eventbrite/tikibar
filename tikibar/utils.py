@@ -75,23 +75,18 @@ def get_tiki_token_or_false_for_tikibar_view(request):
 
 
 def tikibar_enabled(request):
-    try:
-        from permissions.client import Client as PermissionClient
-        from permissions import constants as permission_constants
+    path_info = request.META.get('PATH_INFO', '')
+    if any(path_info.startswith(exclude_path) for exclude_path in settings.TIKIBAR_SETTINGS.get('skip_urls')):
+        return False
 
-        perm_client = PermissionClient()
-        permissions = (
-            permission_constants.PERMISSION_GLOBAL_ENGINEERING,
-            permission_constants.PERMISSION_GLOBAL_OPERATIONS,
-        )
+    tikibar_enabled_check_func = settings.TIKIBAR_SETTINGS.get('tikibar_enabled_check_function')
+    if tikibar_enabled_check_func is not None:
+        return tikibar_enabled_check_func(request)
 
-        return perm_client.check_any_permission(permissions, permission_constants.ENTITY_TYPE_GLOBAL, None)
-
-    except (ImportError, exceptions.ObjectDoesNotExist):
-        if hasattr(settings, 'ENABLE_TIKIBAR'):
-            return settings.ENABLE_TIKIBAR
-        if settings.DEBUG:
-            return settings.DEBUG
+    if hasattr(settings, 'ENABLE_TIKIBAR'):
+        return settings.ENABLE_TIKIBAR
+    if settings.DEBUG:
+        return settings.DEBUG
     return False
 
 
