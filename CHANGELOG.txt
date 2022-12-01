@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.4.0 (2022-12-01)
+------------------
+- Move tikibar enabled check to the client for more customization
+- Add setting to skip specific URLs
+
 0.3.4 (2022-01-11)
 ------------------
 - replace deprecated gargoyle with tikibar permission group
